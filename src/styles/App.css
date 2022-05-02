@@ -1,7 +1,19 @@
+
+* {
+  box-sizing: border-box;
+}
 .App {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.or{
+  cursor:pointer;
+}
+.oracle{
+display: flex;
+justify-content: center;
 }
 .button {
 
@@ -15,15 +27,22 @@
  background-color: blue;
   color:white;
 }
-
+#navbar {
+  display: flex;
+  margin: 20px;
+  justify-content: space-evenly;
+}
+li {
+  list-style: none;
+}
 .button-container {
-  width: 600px;
+  width: 555px;
   overflow-y: auto;
 }
 
 .button-container > button {
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 70px;
   float: left;
   background: lightgray;   
   margin: 5px;

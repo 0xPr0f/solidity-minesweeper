@@ -1,49 +1,532 @@
 import "./styles/App.css";
+import { ConnectButton } from "web3uikit";
+import { useMoralis, useChain } from "react-moralis";
+import { useNotification } from "web3uikit";
+import { React, useEffect, useState } from "react";
+import { Abi } from "./abi";
+import { ethers } from "ethers";
+import { Modal } from "antd";
+import Navbar from "./navbar";
 
 function App() {
+  const dispatch = useNotification();
+  const { chainId, Moralis, web3, isAuthenticated } = useMoralis();
+  const { switchNetwork } = useChain();
+  const [connected, setConnected] = useState();
+  const [gameState, setgameState] = useState();
+
+  const [open, setOpen] = useState();
+  const [time, setTime] = useState(60);
+
+  const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+  const handleNewNotification = (type, icon, position, message, title) => {
+    dispatch({
+      type,
+      message: message,
+      title: title,
+      icon,
+      position: position || "topR",
+    });
+  };
+
+  const handleCancel = (e) => {
+    console.log("Do not interrupt the process");
+    handleNewNotification(
+      "error",
+      undefined,
+      "topR",
+      "Do not interrupt the process",
+      "Invalid Click"
+    );
+  };
+
+  // Connect to prof chainLink oracle
+  ////////////////////////// START Oracle /////////////////////////////
+  function ModalOpen() {
+    let secondsToGo = 60;
+
+    const timer = setInterval(() => {
+      secondsToGo -= 1;
+      setTime(secondsToGo);
+    }, 1000);
+
+    setTimeout(async () => {
+      clearInterval(timer);
+      setOpen(false);
+      delay(2000);
+      startGame();
+    }, secondsToGo * 1000);
+  }
+
+  async function connectToOracle() {
+    if (chainId === "0x4" && isAuthenticated) {
+      const options = {
+        contractAddress: "0xCfa74A35AB1efC5569b585FDC8bFB93b9743390d",
+        functionName: "GetRandomNum",
+        abi: Abi,
+        msgValue: "",
+      };
+      const transaction = await Moralis.executeFunction(options);
+
+      // openModa
+
+      const receipt = await transaction.wait();
+      handleNewNotification(
+        "success",
+        undefined,
+        "topR",
+        `https://rinkeby.etherscan.io/tx/${JSON.stringify(
+          receipt.transactionHash
+        ).replace(/^"(.*)"$/, "$1")}`,
+        "Transaction Successful"
+      );
+      console.log(
+        `https://rinkeby.etherscan.io/tx/${JSON.stringify(
+          receipt.transactionHash
+        ).replace(/^"(.*)"$/, "$1")}`
+      );
+      setOpen(true);
+      ModalOpen();
+    } else if (isAuthenticated) {
+      handleNewNotification(
+        "error",
+        undefined,
+        "topR",
+        "Change chain to rinkeby (0x4)",
+        "Chain Not Supported"
+      );
+    } else {
+      alert("Connect your wallet and be on the right chain (rinkeby)");
+    }
+  }
+  ////////////////////////// END Oracle /////////////////////////////
+
+  // Start game
+  async function startGame() {
+    if (chainId === "0x4" && isAuthenticated) {
+      const options = {
+        contractAddress: "0xCfa74A35AB1efC5569b585FDC8bFB93b9743390d",
+        functionName: "capMinesTiles",
+        abi: Abi,
+        msgValue: "",
+      };
+      const transaction = await Moralis.executeFunction(options);
+      const receipt = await transaction.wait();
+      handleNewNotification(
+        "success",
+        undefined,
+        "topR",
+        `https://rinkeby.etherscan.io/tx/${JSON.stringify(
+          receipt.transactionHash
+        ).replace(/^"(.*)"$/, "$1")}`,
+        "Transaction Successful"
+      );
+      setConnected(true);
+      setgameState(true);
+      console.log(
+        `https://rinkeby.etherscan.io/tx/${JSON.stringify(
+          receipt.transactionHash
+        ).replace(/^"(.*)"$/, "$1")}`
+      );
+    } else if (isAuthenticated) {
+      handleNewNotification(
+        "error",
+        undefined,
+        "topR",
+        "Change chain to rinkeby (0x4)",
+        "Chain Not Supported"
+      );
+    } else {
+      alert("Connect your wallet and be on the right chain (rinkeby)");
+    }
+  }
+
+  ///// End or Start game //////////////
+
+  useEffect(() => {
+    Moralis.onChainChanged((chain) => {
+      if (chain !== "0x4") {
+        handleNewNotification(
+          "error",
+          undefined,
+          "topR",
+          "Change chain to rinkeby (0x4)",
+          "Chain Not Supported"
+        );
+      }
+    });
+  }, []);
+
+  //////////////////////////////////////////////////
+
+  /////////////// MOVE LOGIC //////////////////////
+
+  async function Move(id) {
+    //
+    document.getElementById(`${id}`).style.backgroundColor = "blue";
+
+    if (isAuthenticated && connected === true && gameState === true) {
+      if (chainId === "0x4") {
+        try {
+          const contractABI = [
+            "function gaslessMoveCheckAvailability(uint _id) external view returns (bool b)",
+          ];
+          const MineChecker = new ethers.Contract(
+            "0xCfa74A35AB1efC5569b585FDC8bFB93b9743390d",
+            contractABI,
+            web3.getSigner()
+          );
+          console.log(id);
+          const result = await MineChecker.gaslessMoveCheckAvailability(id);
+          console.log(result);
+          if (result === true) {
+            setgameState(false);
+            alert("Steped On Mine, Restart");
+
+            return;
+          } else if (result === false) {
+            document.getElementById(`${id}`).style.backgroundColor = "blue";
+            //
+            const options = {
+              contractAddress: "0xCfa74A35AB1efC5569b585FDC8bFB93b9743390d",
+              functionName: "move",
+              abi: Abi,
+              params: {
+                _id: id,
+              },
+            };
+            const transaction = await Moralis.executeFunction(options);
+            const receipt = await transaction.wait();
+            console.log(
+              `https://rinkeby.etherscan.io/tx/${JSON.stringify(
+                receipt.transactionHash
+              ).replace(/^"(.*)"$/, "$1")}`
+            );
+          }
+        } catch (err) {
+          handleNewNotification("error", undefined, "topR", `${err}`, "ERROR");
+        }
+      } else {
+        await switchNetwork("0x4");
+      }
+    } else {
+      alert("Press Start Game Below");
+    }
+    console.log(chainId);
+  }
+
+  /////////////// END OF MOVE LOGIC //////////////////////
+
   return (
-    <div className="App">
-      <br />
-      <br />
-      <div className="menu-container">
-        <div className="button-container">
-          <button id="0" className="button"></button>
-          <button id="1" className="button"></button>
-          <button id="2" className="button"></button>
-          <button id="3" className="button"></button>
-          <button id="4" className="button"></button>
-          <button id="5" className="button"></button>
-          <button id="6" className="button"></button>
-          <button id="7" className="button"></button>
-          <button id="8" className="button"></button>
-          <button id="9" className="button"></button>
-          <button id="10" className="button"></button>
-          <button id="11" className="button"></button>
-          <button id="12" className="button"></button>
-          <button id="13" className="button"></button>
-          <button id="14" className="button"></button>
-          <button id="15" className="button"></button>
-          <button id="16" className="button"></button>
-          <button id="17" className="button"></button>
-          <button id="18" className="button"></button>
-          <button id="19" className="button"></button>
-          <button id="20" className="button"></button>
-          <button id="21" className="button"></button>
-          <button id="22" className="button"></button>
-          <button id="23" className="button"></button>
-          <button id="24" className="button"></button>
-          <button id="25" className="button"></button>
-          <button id="26" className="button"></button>
-          <button id="27" className="button"></button>
-          <button id="28" className="button"></button>
-          <button id="29" className="button"></button>
-          <button id="30" className="button"></button>
-          <button id="31" className="button"></button>
-          <button id="32" className="button"></button>
-          <button id="33" className="button"></button>
-          <button id="34" className="button"></button>
-          <button id="35" className="button"></button>
+    <div>
+      <Navbar />
+      <h2>Mine Sweeper</h2>
+      <div style={{ display: "flex", justifyContent: "right", margin: "5px" }}>
+        <ConnectButton />
+      </div>
+      <>
+        <Modal
+          title="Connect to Oracle & Starting Game"
+          visible={open}
+          onOk={{ disabled: true }}
+          onCancel={handleCancel}
+          okButtonProps={{ disabled: true }}
+          cancelButtonProps={{ disabled: true }}
+        >
+          <div>
+            <p>Don't interrupt the process !!!</p>
+            <p>Connecting To Oracle and Starting Game</p>
+            <p>Modal will automatically close in {time} seconds ⏳</p>
+            <p>When Modal is closed, accept all trasactions 💸</p>
+          </div>
+        </Modal>
+        <div className="App">
+          <div>
+            <div className="button-container">
+              <button
+                onClick={() => {
+                  Move(0);
+                }}
+                id="0"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(1);
+                }}
+                id="1"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(2);
+                }}
+                id="2"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(3);
+                }}
+                id="3"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(4);
+                }}
+                id="4"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(5);
+                }}
+                id="5"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(6);
+                }}
+                id="6"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(7);
+                }}
+                id="7"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(8);
+                }}
+                id="8"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(9);
+                }}
+                id="9"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(10);
+                }}
+                id="10"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(11);
+                }}
+                id="11"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(12);
+                }}
+                id="12"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(13);
+                }}
+                id="13"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(14);
+                }}
+                id="14"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(15);
+                }}
+                id="15"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(16);
+                }}
+                id="16"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(17);
+                }}
+                id="17"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(18);
+                }}
+                id="18"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(19);
+                }}
+                id="19"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(20);
+                }}
+                id="20"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(21);
+                }}
+                id="21"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(22);
+                }}
+                id="22"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(23);
+                }}
+                id="23"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(24);
+                }}
+                id="24"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(25);
+                }}
+                id="25"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(26);
+                }}
+                id="26"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(27);
+                }}
+                id="27"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(28);
+                }}
+                id="28"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(29);
+                }}
+                id="29"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(30);
+                }}
+                id="30"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(31);
+                }}
+                id="31"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(32);
+                }}
+                id="32"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(33);
+                }}
+                id="33"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(34);
+                }}
+                id="34"
+                className="button"
+              ></button>
+              <button
+                onClick={() => {
+                  Move(35);
+                }}
+                id="35"
+                className="button"
+              ></button>
+            </div>
+          </div>
         </div>
+      </>
+
+      <div className="oracle">
+        <button
+          className="or"
+          style={{
+            margin: "14px",
+            width: "150px",
+            height: "60px",
+            textAlign: "center",
+          }}
+          onClick={() => {
+            connectToOracle();
+          }}
+        >
+          {setgameState === true ? "Restart" : "Start Game"}
+        </button>
+        {/*  <button
+          className="or"
+          style={{
+            margin: "20px",
+            width: "150px",
+            height: "60px",
+            textAlign: "center",
+          }}
+          onClick={ModalOpen}
+        >
+          Start Game lolol
+        </button> */}
       </div>
     </div>
   );
