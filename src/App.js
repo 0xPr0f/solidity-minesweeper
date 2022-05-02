@@ -162,9 +162,6 @@ function App() {
   /////////////// MOVE LOGIC //////////////////////
 
   async function Move(id) {
-    //
-    document.getElementById(`${id}`).style.backgroundColor = "blue";
-
     if (isAuthenticated && connected === true && gameState === true) {
       if (chainId === "0x4") {
         try {
