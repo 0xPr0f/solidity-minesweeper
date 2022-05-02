@@ -22,11 +22,13 @@ function App() {
   const handleOk = () => {
     Restart();
     setOpen1(false);
+    window.location.reload();
   };
 
   const handleCan = () => {
     Restart();
     setOpen1(false);
+    window.location.reload();
   };
 
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
@@ -172,7 +174,11 @@ function App() {
   // RESTART UI LOGIC ////
   function Restart() {
     for (let index = 0; index <= 35; index++) {
-      document.getElementById(`${index}`).style.backgroundColor = "lightgray";
+      if (
+        document.getElementById(`${index}`).style.backgroundColor === "blue"
+      ) {
+        document.getElementById(`${index}`).style.backgroundColor = "lightgray";
+      }
     }
   }
 
@@ -204,7 +210,6 @@ function App() {
             setOpen1(true);
             return;
           } else if (result === false) {
-            document.getElementById(`${id}`).style.backgroundColor = "blue";
             //
             const options = {
               contractAddress: "0x1851aFeEF0838DB95A66d7ecE14CFB2bCbC9e34D",
@@ -216,6 +221,7 @@ function App() {
             };
             const transaction = await Moralis.executeFunction(options);
             const receipt = await transaction.wait();
+            document.getElementById(`${id}`).style.backgroundColor = "blue";
             console.log(
               `https://rinkeby.etherscan.io/tx/${JSON.stringify(
                 receipt.transactionHash

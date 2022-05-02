@@ -4,6 +4,7 @@ import "./RandomGenerator.sol";
 
 /// @title MineEngine - the first 100% on-chain Mine Sweeper engine.
 /// @author 0xpr0f
+/// @notice Created with Create2
 contract MineEngine {
 
     event movedTile       (address indexed player, uint256 id);
@@ -15,18 +16,20 @@ contract MineEngine {
 
 //////////       Base Variables       ////////////////////
     address public generator;
-    uint256[] internal mineTiles;
+   // uint256[] internal mineTiles;
     mapping(address => bool) public isAdmin;
     mapping(address => mapping(uint256 => uint256)) internal moved;
 
     string public constant NAME = "0xProf's MineSweeper";
     string public constant DIFFICULTY = "Normal";
+    mapping (address => uint[]) private addressedMineNumber;
+    address profOracleGenerator = 0x0C37210b8dcCbe88cDAe1F7683eaFFe772A869cF;
 
 ///////////////////////////////////////////////////////////////
 
 
-/// @notice Assign Random Generator to Deployed Oracle 
-    constructor(address profOracleGenerator) {
+/// @dev Assign Random Generator to Deployed Oracle 
+    constructor() {
         generator = profOracleGenerator;
         isAdmin[msg.sender] = true;
     }
@@ -37,22 +40,22 @@ contract MineEngine {
 
 
 ///  Request RandomNess from oracle ///
-/// @notice Request Randomness from oracle contract connected to a vrf stream ///
+/// @dev Request Randomness from oracle contract connected to a vrf stream ///
     function GetRandomNum() external {
         for (uint256 i = 0; i <= 10; ++i) {
             moved[msg.sender][i] = 0;
         }
         RandomGenerator(generator).requestRandomWords();
-        mineTiles = RandomGenerator(generator).passRandomNum();
-        emit generatedTiles(generator, msg.sender, mineTiles.length);
+        addressedMineNumber[msg.sender] = RandomGenerator(generator).passRandomNum();
+        emit generatedTiles(generator, msg.sender, addressedMineNumber[msg.sender].length);
     }
 
 ///  Cap Mine Tiles///
 /// @dev Reduces the vrf numbers into sizable Mine Tiles ///
     function capMinesTiles() external {
-        uint256 length = mineTiles.length;
+        uint256 length = addressedMineNumber[msg.sender].length;
         for (uint256 i = 0; i < length; ++i) {
-            mineTiles[i] = mineTiles[i] % 36;
+            addressedMineNumber[msg.sender][i] = addressedMineNumber[msg.sender][i] % 36;
         }
     }
 
@@ -63,13 +66,13 @@ contract MineEngine {
 
 ///  Return Cap Mines  ///
 /// @dev This Returns the available mine spots in the game ///
-    function getCappedMinesTiles()
+    function getCappedMinesTiles(address _address)
         external
         view
         onlyAdmin
         returns (uint256[] memory)
     {
-        return mineTiles;
+        return addressedMineNumber[_address];
     }
 
 
@@ -77,12 +80,12 @@ contract MineEngine {
 /// @dev This performs a state change to emnit event check on the tile ///
 /// @param _id of Mine ////
     function move(uint256 _id) external returns (bool b) {
-        uint256 length = mineTiles.length;
+        uint256 length = addressedMineNumber[msg.sender].length;
         require(moved[msg.sender][_id] == 0, "You have moved here");
         require(moved[msg.sender][_id] != 2, "Game Over");
         moved[msg.sender][_id] = 1;
         for (uint256 i = 0; i < length; ++i) {
-            if (mineTiles[i] == _id) {
+            if (addressedMineNumber[msg.sender][i] == _id) {
                 b = true;
                 moved[msg.sender][_id] = 2;
                 emit failed(msg.sender, false);
@@ -102,11 +105,15 @@ contract MineEngine {
     {
         require(moved[msg.sender][_id] == 0, "You have moved here");
         require(moved[msg.sender][_id] != 2, "Game Over");
-        uint256 length = mineTiles.length;
+        uint256 length = addressedMineNumber[msg.sender].length;
         for (uint256 i = 0; i < length; ++i) {
-            if (mineTiles[i] == _id) {
+            if (addressedMineNumber[msg.sender][i] == _id) {
                 b = true;
             }
         }
     }
+
+function selfDestruct () external onlyAdmin{
+   selfdestruct(payable(msg.sender));
+}
 }

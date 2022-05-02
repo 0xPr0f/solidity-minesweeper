@@ -18,16 +18,15 @@
 }
 
 .button {
-
-  background-color: lightBlue;
   height: 20px;
   width: 20px;
   cursor: pointer;
 }
-
+.button{
+  background: lightgray;
+}
 .button:hover {
   background-color: lightblue;
-  color: white;
 }
 
 #navbar {
