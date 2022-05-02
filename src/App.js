@@ -73,7 +73,7 @@ function App() {
     if (chainId === "0x4" && isAuthenticated) {
       Restart();
       const options = {
-        contractAddress: "0xCfa74A35AB1efC5569b585FDC8bFB93b9743390d",
+        contractAddress: "0x1851aFeEF0838DB95A66d7ecE14CFB2bCbC9e34D",
         functionName: "GetRandomNum",
         abi: Abi,
         msgValue: "",
@@ -115,7 +115,7 @@ function App() {
   async function startGame() {
     if (chainId === "0x4" && isAuthenticated) {
       const options = {
-        contractAddress: "0xCfa74A35AB1efC5569b585FDC8bFB93b9743390d",
+        contractAddress: "0x1851aFeEF0838DB95A66d7ecE14CFB2bCbC9e34D",
         functionName: "capMinesTiles",
         abi: Abi,
         msgValue: "",
@@ -191,7 +191,7 @@ function App() {
             "function gaslessMoveCheckAvailability(uint _id) external view returns (bool b)",
           ];
           const MineChecker = new ethers.Contract(
-            "0xCfa74A35AB1efC5569b585FDC8bFB93b9743390d",
+            "0x1851aFeEF0838DB95A66d7ecE14CFB2bCbC9e34D",
             contractABI,
             web3.getSigner()
           );
@@ -207,7 +207,7 @@ function App() {
             document.getElementById(`${id}`).style.backgroundColor = "blue";
             //
             const options = {
-              contractAddress: "0xCfa74A35AB1efC5569b585FDC8bFB93b9743390d",
+              contractAddress: "0x1851aFeEF0838DB95A66d7ecE14CFB2bCbC9e34D",
               functionName: "move",
               abi: Abi,
               params: {

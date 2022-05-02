@@ -1,5 +1,10 @@
 export const Abi = [
   {
+    inputs: [],
+    stateMutability: "nonpayable",
+    type: "constructor",
+  },
+  {
     inputs: [
       {
         internalType: "string",
@@ -98,56 +103,8 @@ export const Abi = [
     type: "event",
   },
   {
-    inputs: [],
-    name: "capMinesTiles",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "GetRandomNum",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_id",
-        type: "uint256",
-      },
-    ],
-    name: "move",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "b",
-        type: "bool",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    stateMutability: "payable",
-    type: "receive",
-  },
-  {
     stateMutability: "payable",
     type: "fallback",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "profOracleGenerator",
-        type: "address",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "constructor",
   },
   {
     inputs: [],
@@ -160,6 +117,33 @@ export const Abi = [
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "GetRandomNum",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "NAME",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "capMinesTiles",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -195,7 +179,13 @@ export const Abi = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "address",
+        name: "_address",
+        type: "address",
+      },
+    ],
     name: "getCappedMinesTiles",
     outputs: [
       {
@@ -227,16 +217,33 @@ export const Abi = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "NAME",
-    outputs: [
+    inputs: [
       {
-        internalType: "string",
-        name: "",
-        type: "string",
+        internalType: "uint256",
+        name: "_id",
+        type: "uint256",
       },
     ],
-    stateMutability: "view",
+    name: "move",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "b",
+        type: "bool",
+      },
+    ],
+    stateMutability: "nonpayable",
     type: "function",
+  },
+  {
+    inputs: [],
+    name: "selfDestruct",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    stateMutability: "payable",
+    type: "receive",
   },
 ];
