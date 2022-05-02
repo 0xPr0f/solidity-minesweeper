@@ -23,7 +23,6 @@ export const About = () => {
               &nbsp;0xpr0f
             </a>
           </li>
-
           <br />
           <li>There are currently some Known bugs</li>
           <li>
@@ -38,7 +37,9 @@ export const About = () => {
             2) The oracle process time maybe slow causing it to delay or
             potentially return nothing.
           </li>
-          <li>3) Possibly a UI error.</li>
+          <li>3) Oracle changing during run time due to multiple requests.</li>
+          <li>4) Possibly a UI error.</li>
+          <li>5) Gas validation and id inaccuracy on UI.</li>
           <br />
           <li>
             Any bugs found or improvement suggested, you can contact me by

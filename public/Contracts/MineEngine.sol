@@ -2,8 +2,9 @@
 pragma solidity ^0.8.8;
 import "./RandomGenerator.sol";
 
+/// @title MineEngine - the first 100% on-chain Mine Sweeper engine.
+/// @author 0xpr0f
 // deployed at : 0xCfa74A35AB1efC5569b585FDC8bFB93b9743390d
-/// @notice made by 0xpr0f
 contract MineEngine {
 
     event movedTile       (address indexed player, uint256 id);
@@ -19,7 +20,7 @@ contract MineEngine {
     mapping(address => bool) public isAdmin;
     mapping(address => mapping(uint256 => uint256)) internal moved;
 
-    string public constant NAME = "0xProf`s MineSweeper";
+    string public constant NAME = "0xProf's MineSweeper";
     string public constant DIFFICULTY = "Normal";
 
 ///////////////////////////////////////////////////////////////

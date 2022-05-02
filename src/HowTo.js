@@ -17,7 +17,10 @@ export const HowTo = () => {
             2) When selecting tiles, accept all trasactions, the contract has
             been made to reduce signifant amount of gas for onChain activities.
           </li>
-          <li> 3) All activities are done onChain and with an oracle.</li>
+          <li>
+            {" "}
+            3) All activities with logic are done onChain and with an oracle.
+          </li>
           <li>
             4) There are 10 bombs on the mine map, try your best to predict them
             and avoid them, else you lose the prize.

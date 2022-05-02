@@ -20,12 +20,15 @@ function App() {
   const [time, setTime] = useState(60);
 
   const handleOk = () => {
+    Restart();
     setOpen1(false);
   };
 
   const handleCan = () => {
+    Restart();
     setOpen1(false);
   };
+
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
   const handleNewNotification = (type, icon, position, message, title) => {
     dispatch({
@@ -68,6 +71,7 @@ function App() {
 
   async function connectToOracle() {
     if (chainId === "0x4" && isAuthenticated) {
+      Restart();
       const options = {
         contractAddress: "0xCfa74A35AB1efC5569b585FDC8bFB93b9743390d",
         functionName: "GetRandomNum",
@@ -167,11 +171,23 @@ function App() {
 
   //////////////////////////////////////////////////
 
+  // RESTART UI LOGIC ////
+  function Restart() {
+    for (let index = 0; index <= 35; index++) {
+      document.getElementById(`${index}`).style.backgroundColor = "lightgray";
+    }
+  }
+
+  // END RESTART UI LOGIC ////
+
   /////////////// MOVE LOGIC //////////////////////
 
   async function Move(id) {
     if (isAuthenticated && connected === true && gameState === true) {
-      if (chainId === "0x4") {
+      if (
+        chainId === "0x4" &&
+        document.getElementById(`${id}`).style.backgroundColor !== "blue"
+      ) {
         try {
           const contractABI = [
             "function gaslessMoveCheckAvailability(uint _id) external view returns (bool b)",
@@ -209,6 +225,7 @@ function App() {
             );
           }
         } catch (err) {
+          document.getElementById(`4`).style.backgroundColor = "lightgray";
           handleNewNotification("error", undefined, "topR", `${err}`, "ERROR");
         }
       } else {
@@ -217,7 +234,6 @@ function App() {
     } else {
       alert("Press Start Game Below");
     }
-    console.log(chainId);
   }
 
   /////////////// END OF MOVE LOGIC //////////////////////
@@ -226,22 +242,32 @@ function App() {
     <div>
       <Navbar />
       <h2>Mine Sweeper</h2>
-     
+
       <div style={{ display: "flex", justifyContent: "right", margin: "5px" }}>
         <ConnectButton />
       </div>
-      <div style={{ display: "flex", justifyContent: "left", margin: "5px" }}> {gameState === true ? <h3>--- Game Started ---</h3> : <h3>--- Game Not Started ---</h3>} </div>
-     
-      <>
-      <Modal visible={open1} onOk={handleOk} onCancel={handleCan}>
-        <h2>LOL terrible guess</h2>
-        <br/>
-       <h3> <p>Damm it, you stepped on a mine !!! 🤯</p>
-        <p>Better luck Next Time !!!</p>
-        <p>HINT : It is imposible to win</p>
-        </h3>
-      </Modal>
+      <div style={{ display: "flex", justifyContent: "left", margin: "5px" }}>
+        {" "}
+        {gameState === true ? (
+          <h3>--- Game Started ---</h3>
+        ) : (
+          <h3>--- Game Not Started ---</h3>
+        )}{" "}
+      </div>
 
+      <>
+        {/* Modal For STEPPING ON A MINE */}
+        <Modal visible={open1} onOk={handleOk} onCancel={handleCan}>
+          <h2>LOL terrible guess</h2>
+          <br />
+          <h3>
+            {" "}
+            <p>Damm it, you stepped on a mine !!! 🤯</p>
+            <p>Better luck Next Time !!!</p>
+            <p>HINT : It is imposible to win</p>
+          </h3>
+        </Modal>
+        {/* Modal For CONNECTING TO THE ORACLE AND STARTING A GAME */}
         <Modal
           visible={open}
           onOk={{ disabled: true }}
@@ -250,14 +276,14 @@ function App() {
           cancelButtonProps={{ disabled: true }}
         >
           <div>
-          <h2>Connecting to Oracle & Starting Game</h2>
-          <br/>
+            <h2>Connecting to Oracle & Starting Game</h2>
+            <br />
             <h3>
-            <p>Don't interrupt the process !!!</p>
-            <p>Connecting To Oracle and Starting Game</p>
-            <p>Establishing a secure connection to the Oracle</p>
-            <p>Modal will automatically close in {time} seconds ⏳</p>
-            <p>When Modal is closed, accept all trasactions 💸</p>
+              <p>Don't interrupt the process !!!</p>
+              <p>Connecting To Oracle and Starting Game</p>
+              <p>Establishing a secure connection to the Oracle</p>
+              <p>Modal will automatically close in {time} seconds ⏳</p>
+              <p>When Modal is closed, accept all trasactions 💸</p>
             </h3>
           </div>
         </Modal>
@@ -536,7 +562,8 @@ function App() {
         >
           {gameState === true ? "Restart" : "Start Game"}
         </button>
-        {/*  <button
+        {/*}
+         <button
           className="or"
           style={{
             margin: "20px",
@@ -544,10 +571,10 @@ function App() {
             height: "60px",
             textAlign: "center",
           }}
-          onClick={ModalOpen}
+          onClick={test}
         >
           Start Game lolol
-        </button> */}
+        </button>*/}
       </div>
     </div>
   );
