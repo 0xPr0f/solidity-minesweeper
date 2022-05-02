@@ -49,7 +49,7 @@ contract MineEngine {
     }
 
 ///  Cap Mine Tiles///
-/// @notice Reduces the vrf numbers into sizable Mine Tiles ///
+/// @dev Reduces the vrf numbers into sizable Mine Tiles ///
     function capMinesTiles() external {
         uint256 length = mineTiles.length;
         for (uint256 i = 0; i < length; ++i) {
@@ -63,7 +63,7 @@ contract MineEngine {
     }
 
 ///  Return Cap Mines  ///
-/// @notice This Returns the available mine spots in the game ///
+/// @dev This Returns the available mine spots in the game ///
     function getCappedMinesTiles()
         external
         view
@@ -75,7 +75,8 @@ contract MineEngine {
 
 
 ///  Check Tiles ///
-/// @notice This performs a state change to emnit event check on the tile ///
+/// @dev This performs a state change to emnit event check on the tile ///
+/// @param _id of Mine ////
     function move(uint256 _id) external returns (bool b) {
         uint256 length = mineTiles.length;
         require(moved[msg.sender][_id] == 0, "You have moved here");
@@ -93,7 +94,8 @@ contract MineEngine {
     }
 
 ///  Gaslessly Check Tiles ///
-/// @notice This is gasless and performs a non state changing check on the tile ///
+/// @dev This is gasless and performs a non state changing check on the tile ///
+/// @param _id of Mine ////
     function gaslessMoveCheckAvailability(uint256 _id)
         external
         view
