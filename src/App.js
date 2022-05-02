@@ -80,8 +80,6 @@ function App() {
       };
       const transaction = await Moralis.executeFunction(options);
 
-      // openModa
-
       const receipt = await transaction.wait();
       handleNewNotification(
         "success",
