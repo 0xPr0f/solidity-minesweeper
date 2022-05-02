@@ -226,14 +226,17 @@ function App() {
     <div>
       <Navbar />
       <h2>Mine Sweeper</h2>
+     
       <div style={{ display: "flex", justifyContent: "right", margin: "5px" }}>
         <ConnectButton />
       </div>
+      <div style={{ display: "flex", justifyContent: "left", margin: "5px" }}> {gameState === true ? <h3>--- Game Started ---</h3> : <h3>--- Game Not Started ---</h3>} </div>
+     
       <>
       <Modal visible={open1} onOk={handleOk} onCancel={handleCan}>
         <h2>LOL terrible guess</h2>
         <br/>
-       <h3> <p>Damn you stepped on a mine !!! 🤯</p>
+       <h3> <p>Damm it, you stepped on a mine !!! 🤯</p>
         <p>Better luck Next Time !!!</p>
         <p>HINT : It is imposible to win</p>
         </h3>
@@ -252,6 +255,7 @@ function App() {
             <h3>
             <p>Don't interrupt the process !!!</p>
             <p>Connecting To Oracle and Starting Game</p>
+            <p>Establishing a secure connection to the Oracle</p>
             <p>Modal will automatically close in {time} seconds ⏳</p>
             <p>When Modal is closed, accept all trasactions 💸</p>
             </h3>
