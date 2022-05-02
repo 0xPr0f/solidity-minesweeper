@@ -16,8 +16,16 @@ function App() {
   const [gameState, setgameState] = useState();
 
   const [open, setOpen] = useState();
+  const [open1, setOpen1] = useState();
   const [time, setTime] = useState(60);
 
+  const handleOk = () => {
+    setOpen1(false);
+  };
+
+  const handleCan = () => {
+    setOpen1(false);
+  };
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
   const handleNewNotification = (type, icon, position, message, title) => {
     dispatch({
@@ -179,7 +187,7 @@ function App() {
           if (result === true) {
             setgameState(false);
             alert("Steped On Mine, Restart");
-
+            setOpen1(true);
             return;
           } else if (result === false) {
             document.getElementById(`${id}`).style.backgroundColor = "blue";
@@ -222,8 +230,16 @@ function App() {
         <ConnectButton />
       </div>
       <>
+      <Modal visible={open1} onOk={handleOk} onCancel={handleCan}>
+        <h2>LOL terrible guess</h2>
+        <br/>
+       <h3> <p>Damn you stepped on a mine !!! 🤯</p>
+        <p>Better luck Next Time !!!</p>
+        <p>HINT : It is imposible to win</p>
+        </h3>
+      </Modal>
+
         <Modal
-          title="Connect to Oracle & Starting Game"
           visible={open}
           onOk={{ disabled: true }}
           onCancel={handleCancel}
@@ -231,10 +247,14 @@ function App() {
           cancelButtonProps={{ disabled: true }}
         >
           <div>
+          <h2>Connecting to Oracle & Starting Game</h2>
+          <br/>
+            <h3>
             <p>Don't interrupt the process !!!</p>
             <p>Connecting To Oracle and Starting Game</p>
             <p>Modal will automatically close in {time} seconds ⏳</p>
             <p>When Modal is closed, accept all trasactions 💸</p>
+            </h3>
           </div>
         </Modal>
         <div className="App">
@@ -510,7 +530,7 @@ function App() {
             connectToOracle();
           }}
         >
-          {setgameState === true ? "Restart" : "Start Game"}
+          {gameState === true ? "Restart" : "Start Game"}
         </button>
         {/*  <button
           className="or"
