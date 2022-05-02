@@ -203,8 +203,11 @@ function App() {
           );
           console.log(id);
           const result = await MineChecker.gaslessMoveCheckAvailability(id);
+          document.getElementById(`${id}`).style.backgroundColor = "blue";
           console.log(result);
           if (result === true) {
+            document.getElementById(`${id}`).style.backgroundColor =
+              "lightgray";
             setgameState(false);
             alert("Steped On Mine, Restart");
             setOpen1(true);
