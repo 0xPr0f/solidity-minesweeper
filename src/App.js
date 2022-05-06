@@ -7,12 +7,20 @@ import { Abi } from "./abi";
 import { ethers } from "ethers";
 import { Modal } from "antd";
 import Navbar from "./navbar";
+import UAuth from "@uauth/js";
+
+const uauth = new UAuth({
+  clientID: "129f3864-6a9c-4688-90d6-3fb52dcd2f91",
+  redirectUri: "http://localhost:3000/",
+});
 
 function App() {
   const dispatch = useNotification();
-  const { chainId, Moralis, web3, isAuthenticated } = useMoralis();
+  const { chainId, Moralis, web3, isAuthenticated, authenticate, logout } =
+    useMoralis();
   const { switchNetwork } = useChain();
   const [connected, setConnected] = useState();
+  const [Uauth, setUauth] = useState();
   const [gameState, setgameState] = useState();
 
   const [open, setOpen] = useState();
@@ -244,6 +252,41 @@ function App() {
   }
 
   /////////////// END OF MOVE LOGIC //////////////////////
+  const getEllipsisTxt = (str, n = 6) => {
+    if (str) {
+      return `${str.slice(0, n)}...${str.slice(str.length - n)}`;
+    }
+    return "";
+  };
+  //////////// Login ////////////////
+  async function Connect() {
+    try {
+      const authorization = await uauth.loginWithPopup();
+      //   console.log(
+      //    JSON.parse(JSON.stringify(authorization))["idToken"]["sub"],
+      //   JSON.parse(JSON.stringify(authorization))["idToken"]["wallet_address"]
+      //   );
+      setUauth(JSON.parse(JSON.stringify(authorization))["idToken"]);
+
+      await authenticate();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function logOut() {
+    uauth.logout();
+    logout();
+    // setUauth();
+  }
+
+  function log() {
+    if (Uauth === null || Uauth === undefined) {
+      Connect();
+    } else {
+      logOut();
+    }
+  }
 
   return (
     <div>
@@ -251,7 +294,13 @@ function App() {
       <h2>Mine Sweeper</h2>
 
       <div style={{ display: "flex", justifyContent: "right", margin: "5px" }}>
-        <ConnectButton />
+        <button onClick={log}>
+          {Uauth != null
+            ? Uauth["sub"] +
+              " connected as " +
+              getEllipsisTxt(Uauth["wallet_address"])
+            : "Connect"}
+        </button>
       </div>
       <div style={{ display: "flex", justifyContent: "left", margin: "5px" }}>
         {" "}
