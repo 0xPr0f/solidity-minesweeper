@@ -7,11 +7,12 @@ Minesweeper is a single-player puzzle video game. The objective of the game is t
 
 Solidity Minesweeper is an onchain implementation of the Mine Sweeper game.
 How it is made:
-** smart contracts **
+** smart contracts **  
 - chainlink vrf is used to create an oracle to supply verified random numbers upon request.
 - then the numbers are stored in an array and are fitted into 36 tiles with a total of 10 mines
 - then we call a fucntion that takes in a tile id to move
-** frontend **
+
+** frontend **  
 - this is just a representation of the smart contract (GUI)
 
 #### [More about minesweeper](https://en.wikipedia.org/wiki/Minesweeper_(video_game))
