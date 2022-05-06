@@ -11,7 +11,7 @@ import UAuth from "@uauth/js";
 
 const uauth = new UAuth({
   clientID: "129f3864-6a9c-4688-90d6-3fb52dcd2f91",
-  redirectUri: "https://udminesweeper.netlify.app/",
+  redirectUri: "https://udminesweeper.netlify.app/callback",
 });
 
 function App() {
